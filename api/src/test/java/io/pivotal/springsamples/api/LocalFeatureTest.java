@@ -11,6 +11,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
         classes = Application.class,
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
+@TestPropertySource(properties = {
+        "upcoming.window=1"
+})
 public class LocalFeatureTest extends FeatureTest {
 
     @Value("${local.server.port}")
@@ -19,6 +22,11 @@ public class LocalFeatureTest extends FeatureTest {
     @Override
     protected String rootUrl() {
         return "http://localhost:" + port;
+    }
+
+    @Override
+    protected Integer upcomingWindow() {
+        return 1;
     }
 
 }

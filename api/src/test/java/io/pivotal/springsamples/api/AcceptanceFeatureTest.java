@@ -8,4 +8,9 @@ public class AcceptanceFeatureTest extends FeatureTest {
     protected String rootUrl() {
         return "http://www.example.com/eventapi";
     }
+
+    @Override
+    protected Integer upcomingWindow() {
+        return 5; // whatever the upcoming window is configured to in Acceptance
+    }
 }
