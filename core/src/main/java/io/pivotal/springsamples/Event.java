@@ -1,7 +1,10 @@
 package io.pivotal.springsamples;
 
+import lombok.EqualsAndHashCode;
+
 import java.time.LocalDate;
 
+@EqualsAndHashCode
 public class Event {
     private String id;
     private String title;
@@ -32,5 +35,9 @@ public class Event {
 
     public LocalDate getDate() {
         return date;
+    }
+
+    public String toString() {
+        return title;
     }
 }
