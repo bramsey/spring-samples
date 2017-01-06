@@ -55,7 +55,17 @@ public class EventsController {
     public ResponseEntity getEvent(@PathVariable("id") String eventId) {
         return fetchEvent.perform(
                 eventId,
-                event -> ResponseEntity.ok(toJson(event))
+                new FetchEvent.ResultHandler<ResponseEntity>() {
+                    @Override
+                    public ResponseEntity foundEvent(Event event) {
+                        return ResponseEntity.ok(toJson(event));
+                    }
+
+                    @Override
+                    public ResponseEntity eventNotFound(String nonexistentEventId) {
+                        return ResponseEntity.notFound().build();
+                    }
+                }
         );
     }
 

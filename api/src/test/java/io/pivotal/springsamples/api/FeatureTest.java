@@ -79,6 +79,16 @@ public abstract class FeatureTest {
                 .body("$.size()", equalTo(2));
     }
 
+    @Test
+    public void sadPaths() throws Exception {
+        given()
+                .contentType(ContentType.APPLICATION_JSON.toString())
+                .when()
+                .get(rootUrl() + "/api/events/nonexistent-id")
+                .then()
+                .statusCode(404);
+    }
+
     private static String formatted(LocalDate date) {
         return date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }

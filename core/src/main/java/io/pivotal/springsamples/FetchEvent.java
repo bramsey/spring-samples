@@ -1,5 +1,7 @@
 package io.pivotal.springsamples;
 
+import java.util.Optional;
+
 public class FetchEvent {
     private EventRepository eventRepository;
 
@@ -8,10 +10,17 @@ public class FetchEvent {
     }
 
     public <T> T perform(String id, ResultHandler<T> resultHandler) {
-        return resultHandler.foundEvent(eventRepository.find(id).get());
+        Optional<Event> event = eventRepository.find(id);
+
+        if(event.isPresent()) {
+            return resultHandler.foundEvent(event.get());
+        } else {
+            return resultHandler.eventNotFound(id);
+        }
     }
 
     public interface ResultHandler<T> {
         T foundEvent(Event event);
+        T eventNotFound(String nonexistentEventId);
     }
 }
