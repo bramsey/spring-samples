@@ -15,12 +15,14 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 
 /* The JPA repository interface we need Spring to implement for us is not in a sub-package of this
- * class, so we need to point Spring to its package. */
+ * class, so we need to point Spring to its package.
+ */
 @EnableJpaRepositories("io.pivotal.springsamples.sql")
 @EntityScan("io.pivotal.springsamples.sql")
 
 /* Classes with one constructor for which Spring can satisfy all arguments (without any cleverness
- * like @Qualifier or @Profile annotations) can be @Import'ed instead of writing out @Bean methods */
+ * like @Qualifier or @Profile annotations) can be @Import'ed instead of writing out @Bean methods
+ */
 @Import({
         CreateEvent.class,
         FetchEvent.class,
@@ -35,7 +37,8 @@ public class Application {
     }
 
     /* FetchUpcomingEvents cannot be @Import'ed because it isn't a direct delegation to the constructor;
-     * we need to pull the specific config value it needs off of the configValues object. */
+     * we need to pull the specific config value it needs off of the configValues object.
+     */
     @Bean
     public FetchUpcomingEvents fetchUpcomingEvents(EventRepository eventRepository, ConfigValues configValues) {
         return new FetchUpcomingEvents(eventRepository, configValues.upcomingEventsWindow());
