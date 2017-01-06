@@ -5,6 +5,7 @@ import io.pivotal.springsamples.CreateEvent;
 import io.pivotal.springsamples.Event;
 import io.pivotal.springsamples.FetchEvent;
 import io.pivotal.springsamples.FetchUpcomingEvents;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +20,8 @@ import java.util.stream.Collectors;
 public class EventsController {
 
     private final CreateEvent createEvent;
-    private FetchEvent fetchEvent;
-    private FetchUpcomingEvents fetchUpcomingEvents;
+    private final FetchEvent fetchEvent;
+    private final FetchUpcomingEvents fetchUpcomingEvents;
 
     @Autowired
     public EventsController(CreateEvent createEvent,
@@ -31,6 +32,12 @@ public class EventsController {
         this.fetchUpcomingEvents = fetchUpcomingEvents;
     }
 
+    @Getter
+    private static class CreateEventRequest {
+        private String title;
+        private String date;
+    }
+
     @RequestMapping(value = "/api/events", method = RequestMethod.POST)
     public ResponseEntity createEvent(@RequestBody CreateEventRequest request, UriComponentsBuilder uriBuilder) {
         return createEvent.perform(
@@ -39,15 +46,19 @@ public class EventsController {
                 LocalDateTime.now(),
                 event -> ResponseEntity
                         .created(uriBuilder.path("/api/events/" + event.getId()).build().toUri())
-                        .body(new EventJson(event.getId(), request.getTitle(), request.getDate()))
+                        .body(toJson(event))
         );
     }
 
     @RequestMapping(value = "/api/events/upcoming", method = RequestMethod.GET)
-    public ResponseEntity getEvent() {
+    public ResponseEntity getUpcomingEvents() {
         return fetchUpcomingEvents.perform(
                 LocalDate.now(),
-                events -> ResponseEntity.ok(events.stream().map(EventsController::toJson).collect(Collectors.toList()))
+                events -> ResponseEntity.ok(
+                        events.stream()
+                                .map(EventsController::toJson)
+                                .collect(Collectors.toList())
+                )
         );
     }
 
@@ -69,23 +80,6 @@ public class EventsController {
         );
     }
 
-    private static EventJson toJson(Event event) {
-        return new EventJson(event.getId(), event.getTitle(), event.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-    }
-
-    private static class CreateEventRequest {
-        private String title;
-        private String date;
-
-        public String getDate() {
-            return date;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-    }
-
     private static class EventJson {
         @JsonProperty
         private String id;
@@ -101,5 +95,9 @@ public class EventsController {
             this.title = title;
             this.date = date;
         }
+    }
+
+    private static EventJson toJson(Event event) {
+        return new EventJson(event.getId(), event.getTitle(), event.getDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
     }
 }
